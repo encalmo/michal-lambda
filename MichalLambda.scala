@@ -49,7 +49,7 @@ class MichalLambda(maybeAwsClient: Option[AwsClient] = None) extends LambdaRunti
         )
     ).getOrElse{
       ApiGatewayResponse(
-        body = "Cannot prase input",
+        body = "Cannot parse input",
         statusCode = 400,
         headers = Map.empty,
         isBase64Encoded = false
