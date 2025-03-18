@@ -1,0 +1,7 @@
+{
+    "functionName": "MichalLambda",
+    "architecture": "x86_64",
+    "tags": {
+        "scope": "test"
+    }
+}
