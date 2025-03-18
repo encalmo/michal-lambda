@@ -10,12 +10,13 @@ import upickle.default.*
 import scala.annotation.static
 import org.encalmo.aws.LambdaSecrets
 import scala.language.experimental.namedTuples
+import org.encalmo.lambda.{ApiGatewayRequest, ApiGatewayResponse}
 
 object MichalLambda {
 
   @static def main(args: Array[String]): Unit = new MichalLambda().run()
 
-  case class Config(greeting: String) derives ReadWriter
+  
   case class Response(message: String) derives ReadWriter
 }
 
@@ -23,33 +24,42 @@ class MichalLambda(maybeAwsClient: Option[AwsClient] = None) extends LambdaRunti
 
   import MichalLambda.*
 
-  type ApplicationContext = (config: Config, awsClient: AwsClient)
+
+  //definition of application
+  type ApplicationContext = AwsClient
 
   override def initialize(using environment: LambdaEnvironment): ApplicationContext = {
     val awsClient = maybeAwsClient
-      .getOrElse(AwsClient.initializeWithProperties(environment.maybeGetProperty))
+      .getOrElse(AwsClient.initializeWithProperties(environment.maybeGetProperty))    
 
-    val secrets = LambdaSecrets.retrieveSecrets(environment.maybeGetProperty)
-
-    val greeting = secrets
-      .get("SECRET_LAMBDA_GREETING")
-      .getOrElse("Hello <input>!")
-
-    environment.info(
-      s"Initializing ${environment.getFunctionName()} with a greeting $greeting"
-    )
-
-    val config = Config(greeting)
-
-    (config, awsClient)
+    awsClient
   }
 
   override inline def handleRequest(
       input: String
   )(using lambdaConfig: LambdaContext, context: ApplicationContext): String = {
-    val greeting = context.config.greeting.replace("<input>", input)
-    println(s"Sending greeting: $greeting")
-    Response(greeting).writeAsString
+    input
+      .maybeReadAs[ApiGatewayRequest]
+     .map(request => 
+      ApiGatewayResponse(
+      processInput(request.body),
+      statusCode = 200,
+      headers = Map.empty,
+      isBase64Encoded = false
+        )
+    ).getOrElse{
+      ApiGatewayResponse(
+        body = "Cannot prase input",
+        statusCode = 400,
+        headers = Map.empty,
+        isBase64Encoded = false
+      )
+    }.writeAsString
+
+
+
   }
+
+  def processInput(input: String): String = ???
 
 }

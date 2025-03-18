@@ -4,7 +4,7 @@ import org.encalmo.utils.JsonUtils.*
 
 class MichalLambda2Spec extends TestSuite {
 
-  test("MichalLambda should respond with a message containing a configured greeting") {
+/*  test("MichalLambda should respond with a message containing a configured greeting") {
 
     val environment =
       localAwsCredentials
@@ -28,6 +28,6 @@ class MichalLambda2Spec extends TestSuite {
       .readAs[MichalLambda.Response]
 
     assertEquals(response.message, "Hello Scala!")
-  }
+  }*/
 
 }
