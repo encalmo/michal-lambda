@@ -60,6 +60,6 @@ class MichalLambda(maybeAwsClient: Option[AwsClient] = None) extends LambdaRunti
 
   }
 
-  def processInput(input: String): String = ???
+  def processInput(input: String): String = input
 
 }
