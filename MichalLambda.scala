@@ -11,6 +11,8 @@ import scala.annotation.static
 import org.encalmo.aws.LambdaSecrets
 import scala.language.experimental.namedTuples
 import org.encalmo.lambda.{ApiGatewayRequest, ApiGatewayResponse}
+import Part1.* 
+
 
 object MichalLambda {
 
@@ -37,14 +39,16 @@ class MichalLambda(maybeAwsClient: Option[AwsClient] = None) extends LambdaRunti
 
   override inline def handleRequest(
       input: String
-  )(using lambdaConfig: LambdaContext, context: ApplicationContext): String = {
+  )(using lambdaConfig: LambdaContext, context: ApplicationContext): String = 
     input
       .maybeReadAs[ApiGatewayRequest]
      .map(request => 
       ApiGatewayResponse(
-      processInput(request.body),
+      Part1.solve(request.body),
       statusCode = 200,
-      headers = Map.empty,
+      headers = Map(
+        "Content-Type"->"application/json"
+      ),
       isBase64Encoded = false
         )
     ).getOrElse{
@@ -55,11 +59,7 @@ class MichalLambda(maybeAwsClient: Option[AwsClient] = None) extends LambdaRunti
         isBase64Encoded = false
       )
     }.writeAsString
-
-
-
-  }
-
-  def processInput(input: String): String = input
+    
+    
 
 }
